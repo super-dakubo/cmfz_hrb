@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.ChapterMapper">
+
+    <resultMap id="aa" type="Chapter">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="audio_path" property="audioPath"/>
+        <result column="audio_size" property="audioSize"/>
+        <result column="audio_duration" property="audioDuration"/>
+        <result column="upload_date" property="uploadDate"/>
+        <result column="view_num" property="viewNum"/>
+        <result column="download_num" property="downloadNum"/>
+        <result column="orders" property="orders"/>
+        <association property="album" javaType="Album">
+            <id column="album_id" property="id"/>
+            <result column="aname" property="name"/>
+        </association>
+    </resultMap>
+
+    <select id="select" resultMap="aa">
+      select c.*,a.name aname from chapter c left join album a on c.album_id = a.id
+      <where>
+          <if test="id!=null and id!=''">c.id=#{id} </if>
+          <if test="name!=null and name!=''">and c.name=#{name}</if>
+          <if test="audioPath!=null and audioPath!=''">and c.audio_path=#{audioPath}</if>
+          <if test="audioSize!=null">and c.audio_size=#{audioSize}</if>
+          <if test="audioDuration!=null">and c.audio_duration=#{audioDuration}</if>
+          <if test="uploadDate!=null">and c.upload_date=#{uploadDate}</if>
+          <if test="viewNum!=null">and c.view_num=#{viewNum}</if>
+          <if test="downloadNum!=null and downloadNum!=''">and c.download_num=#{downloadNum}</if>
+          <if test="album.id!=null and album.id!=''">and c.album_id=#{album.id}</if>
+          <if test="album.name!=null and album.name!=''">and a.name=#{album.name}</if>
+          <if test="orders!=null and orders!=''">and c.orders=#{orders}</if>
+      </where>
+        order by a.upload_date desc , c.orders
+    </select>
+
+    <insert id="insert" parameterType="Chapter">
+        INSERT INTO chapter (`id`, `name`, `audio_path`, `audio_size`, `audio_duration`, `upload_date`, `view_num`, `download_num`, `album_id`, `orders`)
+        VALUES (#{id}, #{name}, #{audioPath}, #{audioSize}, #{audioDuration}, #{uploadDate}, #{viewNum,jdbcType=NUMERIC},#{downloadNum,jdbcType=NUMERIC}, #{album.id},#{orders});
+    </insert>
+
+    <update id="update" parameterType="Chapter">
+        update chapter c
+        <set>
+            <if test="name!=null and name!=''">c.name=#{name}</if>
+            <if test="audioPath!=null and audioPath!=''">,c.audio_path=#{audioPath}</if>
+            <if test="audioSize!=null">,c.audio_size=#{audioSize}</if>
+            <if test="audioDuration!=null">,c.audio_duration=#{audioDuration}</if>
+            <if test="uploadDate!=null">,c.upload_date=#{uploadDate}</if>
+            <if test="viewNum!=null">c.view_num=c.view_num+1</if>
+            <if test="downloadNum!=null and downloadNum!=''">c.download_num=c.download_num+1</if>
+            <if test="album.id!=null and album.id!=''">,c.album_id=#{album.id}</if>
+            <if test="album.name!=null and album.name!=''">,a.name=#{album.name}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

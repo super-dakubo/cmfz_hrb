@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.AlbumMapper">
+
+    <select id="showAll" resultType="Album">
+        select  a.id,a.name,a.mark,a.author,a.announcer,a.abstracts,a.img_path imgPath,a.upload_date uploadDate,a.status,o.counts counts
+        from album a
+        left join (select album_id aid,count(album_id) counts  from chapter group by album_id) o
+        on o.aid = a.id
+    </select>
+</mapper>
